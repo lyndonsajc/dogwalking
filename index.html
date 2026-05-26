@@ -285,7 +285,7 @@
 
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzitloAJgE4kcWrsVBK_U46uXG0yFdvir1HjZnIZAMaXPyW6KQFuiChzFXntymcVw1NPQ/exec";
-    const APP_VERSION = "phone-sync-fix-2";
+    const APP_VERSION = "mobile-beacon-save-1";
 
     const walkers = ["Mum", "ex-Dad", "Aidan", "Megan"];
     const durations = [5, 10, 15, 20, 25, 30];
@@ -448,24 +448,25 @@
 
       const params = new URLSearchParams(record);
       params.set("action", "add");
-      params.set("callback", "saveCallback" + Date.now());
+      params.set("cache", Date.now());
 
-      const callbackName = params.get("callback");
-      window[callbackName] = function(response) {
-        setStatus(response && response.ok ? "Saved to Google Sheet." : "Save failed. Check Apps Script.");
-        delete window[callbackName];
-        const oldScript = document.getElementById(callbackName);
-        if (oldScript) oldScript.remove();
+      const url = GOOGLE_SCRIPT_URL + "?" + params.toString();
+
+      // Mobile-safe save method. We do not wait for a reply because some phones block callbacks.
+      const img = new Image();
+      img.src = url;
+
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = url;
+      document.body.appendChild(iframe);
+
+      setStatus("Save request sent. Check Google Sheet, then tap Refresh Records.");
+
+      setTimeout(() => {
+        iframe.remove();
         loadRecords();
-      };
-
-      const script = document.createElement("script");
-      script.id = callbackName;
-      script.src = GOOGLE_SCRIPT_URL + "?" + params.toString();
-      script.onerror = function() {
-        setStatus("Cannot reach Google Script. Open latest Vercel/GitHub link and check phone internet/cache.");
-      };
-      document.body.appendChild(script);
+      }, 2500);
     }
 
     function loadRecords() {
