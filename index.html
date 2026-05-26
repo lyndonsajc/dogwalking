@@ -307,6 +307,16 @@
   </div>
 
   <script>
+    // =========================
+    // GOOGLE SHEETS DATABASE
+    // =========================
+    // 1. Create a Google Sheet
+    // 2. Open Extensions → Apps Script
+    // 3. Paste the Apps Script code below
+    // 4. Deploy as Web App
+    // 5. Replace YOUR_GOOGLE_SCRIPT_URL below
+
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdbghdGNu4F9LlnBnUT5p1xMPc6N6czM022rtARJTh0puIkBcAvTFrKEriRExLrOi90g/exec";
     const walkers = ["Mum", "ex-Dad", "Aidan", "Megan"];
     const minutes = [5, 10, 15, 20, 25, 30];
     const yesNo = ["Yes", "No"];
@@ -339,6 +349,7 @@
           if (disabled) return;
           selection[key] = item;
           renderAll();
+    loadFromGoogleSheets();
         };
         container.appendChild(btn);
       });
@@ -419,8 +430,49 @@
 
       records.unshift(record);
       localStorage.setItem("dogWalkRecords", JSON.stringify(records));
+
+      // Save to Google Sheets
+      saveToGoogleSheets(record);
       clearSelection(false);
       renderAll();
+    }
+
+    async function saveToGoogleSheets(record) {
+      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL") {
+        return;
+      }
+
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(record)
+        });
+      } catch (error) {
+        console.error("Google Sheets save error:", error);
+      }
+    }
+
+    async function loadFromGoogleSheets() {
+      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL") {
+        return;
+      }
+
+      try {
+        const response = await fetch(GOOGLE_SCRIPT_URL);
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          records = data.reverse();
+          localStorage.setItem("dogWalkRecords", JSON.stringify(records));
+          renderRecords();
+        }
+      } catch (error) {
+        console.error("Google Sheets load error:", error);
+      }
     }
 
     function clearSelection(shouldRender = true) {
