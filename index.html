@@ -145,12 +145,7 @@
       font-weight: bold;
     }
 
-    .test-btn {
-      flex: 1 1 150px;
-      background: #6d7df0;
-      color: white;
-      font-weight: bold;
-    }
+    
 
     .status {
       margin-top: 10px;
@@ -264,7 +259,7 @@
 
       <div class="buttons">
         <button class="save-btn" onclick="saveWalk()">Save Walk</button>
-        <button class="test-btn" onclick="testSync()">Test Sync</button>
+        
         <button class="clear-btn" onclick="clearForm()">Clear Selection</button>
       </div>
 
@@ -433,12 +428,11 @@ const APP_VERSION = "firebase-firestore-sync-1";
       return true;
     }
 
-    function buildRecord(isTest = false) {
+    function buildRecord() {
       const now = new Date();
 
-      if (isTest) {
-        return {
-          date: now.toLocaleDateString("en-SG"),
+      return {
+        date: now.toLocaleDateString("en-SG"),
           savedAt: now.toLocaleTimeString("en-SG", { hour: "2-digit", minute: "2-digit" }),
           walker: "FIREBASE TEST",
           time: "TEST",
@@ -487,11 +481,7 @@ const APP_VERSION = "firebase-firestore-sync-1";
       render();
     };
 
-    window.testSync = async function() {
-      const record = buildRecord(true);
-      setStatus("Sending FIREBASE TEST...");
-      await saveRecord(record);
-    };
+    
 
     function listenToRecords() {
       const q = query(collection(db, "dogWalks"), orderBy("createdAt", "desc"), limit(50));
