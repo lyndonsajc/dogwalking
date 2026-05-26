@@ -351,7 +351,6 @@
           if (disabled) return;
           selection[key] = item;
           renderAll();
-    loadFromGoogleSheets();
         };
         container.appendChild(btn);
       });
@@ -448,6 +447,9 @@
       saveToGoogleSheets(record);
       clearSelection(false);
       renderAll();
+
+      // Refresh shared records after saving
+      setTimeout(loadFromGoogleSheets, 1200);
     }
 
     async function saveToGoogleSheets(record) {
@@ -621,6 +623,7 @@
     }
 
     renderAll();
+    loadFromGoogleSheets();
   </script>
 </body>
 </html>
