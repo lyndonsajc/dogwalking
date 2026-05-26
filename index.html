@@ -452,45 +452,47 @@
       setTimeout(loadFromGoogleSheets, 1200);
     }
 
-    async function saveToGoogleSheets(record) {
-      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL") {
-        return;
-      }
+    function saveToGoogleSheets(record) {
+      if (!GOOGLE_SCRIPT_URL) return;
 
-      try {
-        const formData = new URLSearchParams();
-        formData.append("payload", JSON.stringify(record));
+      const params = new URLSearchParams({
+        action: "add",
+        id: record.id,
+        date: record.date,
+        savedAt: record.savedAt,
+        walker: record.walker,
+        time: record.time,
+        minutes: record.minutes,
+        liangSelected: record.liangSelected ? "TRUE" : "FALSE",
+        liangPooped: record.liangPooped || "",
+        jingSelected: record.jingSelected ? "TRUE" : "FALSE",
+        jingPooped: record.jingPooped || ""
+      });
 
-        await fetch(GOOGLE_SCRIPT_URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-          },
-          body: formData.toString()
-        });
-      } catch (error) {
-        console.error("Google Sheets save error:", error);
-      }
+      const img = new Image();
+      img.src = GOOGLE_SCRIPT_URL + "?" + params.toString() + "&cache=" + Date.now();
     }
 
-    async function loadFromGoogleSheets() {
-      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_URL") {
-        return;
-      }
+    function loadFromGoogleSheets() {
+      if (!GOOGLE_SCRIPT_URL) return;
 
-      try {
-        const response = await fetch(GOOGLE_SCRIPT_URL);
-        const data = await response.json();
+      const callbackName = "loadDogWalkRecords" + Date.now();
 
+      window[callbackName] = function(data) {
         if (Array.isArray(data)) {
           records = data.reverse();
           localStorage.setItem("dogWalkRecords", JSON.stringify(records));
           renderRecords();
         }
-      } catch (error) {
-        console.error("Google Sheets load error:", error);
-      }
+        delete window[callbackName];
+        const scriptTag = document.getElementById(callbackName);
+        if (scriptTag) scriptTag.remove();
+      };
+
+      const script = document.createElement("script");
+      script.id = callbackName;
+      script.src = GOOGLE_SCRIPT_URL + "?action=list&callback=" + callbackName + "&cache=" + Date.now();
+      document.body.appendChild(script);
     }
 
     function clearSelection(shouldRender = true) {
