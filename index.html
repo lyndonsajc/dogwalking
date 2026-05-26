@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Family Dog Walking Tracker</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f6f7fb;
+      color: #222;
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: 28px;
+    }
+
+    .top, .bottom {
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+      padding: 16px;
+    }
+
+    .top, .bottom {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .section {
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .button-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 15px;
+      cursor: pointer;
+      background: #e8ecf5;
+      color: #222;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      background: #dbe3f2;
+    }
+
+    button.selected {
+      background: #2f6fed;
+      color: white;
+      font-weight: bold;
+    }
+
+    .dog-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .dog-card {
+      border: 1px solid #dfe4ef;
+      border-radius: 16px;
+      padding: 14px;
+      background: #fbfcff;
+    }
+
+    .dog-card h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    .dog-card.active {
+      border: 2px solid #2f6fed;
+      background: #f1f5ff;
+    }
+
+    .save-btn {
+      width: 100%;
+      border-radius: 14px;
+      background: #1f9d55;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      padding: 14px;
+    }
+
+    .save-btn:hover {
+      background: #168244;
+    }
+
+    .clear-btn {
+      background: #f1b44c;
+      color: #222;
+      font-weight: bold;
+    }
+
+    .reset-btn {
+      background: #e24a4a;
+      color: white;
+      font-weight: bold;
+    }
+
+    .summary-box {
+      background: #f1f5ff;
+      border-left: 5px solid #2f6fed;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+
+    input[type="time"] {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      width: 220px;
+      font-size: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      border-bottom: 1px solid #ddd;
+      padding: 9px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f0f2f7;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .empty {
+      text-align: center;
+      color: #777;
+      padding: 24px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stat-card {
+      background: #f8f9fc;
+      border-radius: 14px;
+      padding: 12px;
+      border: 1px solid #e3e6ef;
+    }
+
+    .stat-number {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2f6fed;
+    }
+
+    .delete-small {
+      background: #eee;
+      color: #555;
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    @media (max-width: 800px) {
+      .dog-panels {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .app {
+        padding: 10px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 9px 12px;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      th, td {
+        padding: 7px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>🐶 Family Dog Walking Tracker</h1>
+
+    <div class="top">
+      <div class="summary-box" id="currentSelection">Select the walk details below.</div>
+
+      <div class="section">
+        <div class="section-title">1. Who walked?</div>
+        <div class="button-grid" id="walkerButtons"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">2. Time walked</div>
+        <input type="time" id="timeInput" onchange="updateTime(this.value)" />
+      </div>
+
+      <div class="section">
+        <div class="section-title">3. How long?</div>
+        <div class="button-grid" id="minuteButtons"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">4. Dog</div>
+        <p style="margin-top:0; color:#666;">Select one or both dogs.</p>
+      </div>
+
+      <div class="dog-panels">
+        <div class="dog-card" id="liangCard">
+          <h2>Liang Liang</h2>
+          <div class="section">
+            <div class="section-title">Selected?</div>
+            <div class="button-grid" id="liangSelectedButtons"></div>
+          </div>
+          <div class="section">
+            <div class="section-title">Pooped?</div>
+            <div class="button-grid" id="liangPoopButtons"></div>
+          </div>
+        </div>
+
+        <div class="dog-card" id="jingCard">
+          <h2>Jing Jing</h2>
+          <div class="section">
+            <div class="section-title">Selected?</div>
+            <div class="button-grid" id="jingSelectedButtons"></div>
+          </div>
+          <div class="section">
+            <div class="section-title">Pooped?</div>
+            <div class="button-grid" id="jingPoopButtons"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="button-grid">
+        <button class="save-btn" onclick="saveWalk()">Save Walk</button>
+        <button class="clear-btn" onclick="clearSelection()">Clear Selection</button>
+        <button class="reset-btn" onclick="resetAll()">Reset All Records</button>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <div class="stats" id="stats"></div>
+      <h2 style="margin-top:0;">Walk Records</h2>
+      <div id="recordList"></div>
+    </div>
+  </div>
+
+  <script>
+    const walkers = ["Mum", "ex-Dad", "Aidan", "Megan"];
+    const minutes = [5, 10, 15, 20, 25, 30];
+    const yesNo = ["Yes", "No"];
+
+    let selection = {
+      walker: "",
+      time: "",
+      minutes: "",
+      liangSelected: false,
+      jingSelected: false,
+      liangPooped: "",
+      jingPooped: ""
+    };
+
+    let records = JSON.parse(localStorage.getItem("dogWalkRecords")) || [];
+
+    function makeButtons(containerId, items, key, labelFn = x => x) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      items.forEach(item => {
+        const btn = document.createElement("button");
+        btn.textContent = labelFn(item);
+        btn.className = selection[key] === item ? "selected" : "";
+        btn.onclick = () => {
+          selection[key] = item;
+          renderAll();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function makeToggleButtons(containerId, key) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      [true, false].forEach(value => {
+        const btn = document.createElement("button");
+        btn.textContent = value ? "✅ Yes" : "❌ No";
+        btn.className = selection[key] === value ? "selected" : "";
+        btn.onclick = () => {
+          selection[key] = value;
+          if (!value) {
+            if (key === "liangSelected") selection.liangPooped = "";
+            if (key === "jingSelected") selection.jingPooped = "";
+          }
+          renderAll();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function updateTime(value) {
+      selection.time = value;
+      renderAll();
+    }
+
+    function selectedDogsText() {
+      const dogs = [];
+      if (selection.liangSelected) dogs.push("Liang Liang");
+      if (selection.jingSelected) dogs.push("Jing Jing");
+      return dogs.length ? dogs.join(" + ") : "-";
+    }
+
+    function renderSelection() {
+      const box = document.getElementById("currentSelection");
+      box.innerHTML = `
+        <strong>Current Selection</strong><br>
+        Dog(s): ${selectedDogsText()} | 
+        Walker: ${selection.walker || "-"} | 
+        Time: ${selection.time || "-"} | 
+        Duration: ${selection.minutes ? selection.minutes + " min" : "-"} | 
+        Liang Liang Pooped: ${selection.liangSelected ? (selection.liangPooped || "-") : "Not walked"} | 
+        Jing Jing Pooped: ${selection.jingSelected ? (selection.jingPooped || "-") : "Not walked"}
+      `;
+    }
+
+    function saveWalk() {
+      if (!selection.walker || !selection.time || !selection.minutes) {
+        alert("Please select walker, time and duration before saving.");
+        return;
+      }
+
+      if (!selection.liangSelected && !selection.jingSelected) {
+        alert("Please select at least one dog.");
+        return;
+      }
+
+      if (selection.liangSelected && !selection.liangPooped) {
+        alert("Please indicate whether Liang Liang pooped.");
+        return;
+      }
+
+      if (selection.jingSelected && !selection.jingPooped) {
+        alert("Please indicate whether Jing Jing pooped.");
+        return;
+      }
+
+      const now = new Date();
+      const record = {
+        id: Date.now(),
+        date: now.toLocaleDateString("en-SG"),
+        savedAt: now.toLocaleTimeString("en-SG", { hour: "2-digit", minute: "2-digit" }),
+        ...selection
+      };
+
+      records.unshift(record);
+      localStorage.setItem("dogWalkRecords", JSON.stringify(records));
+      clearSelection(false);
+      renderAll();
+    }
+
+    function clearSelection(shouldRender = true) {
+      selection = {
+        walker: "",
+        time: "",
+        minutes: "",
+        liangSelected: false,
+        jingSelected: false,
+        liangPooped: "",
+        jingPooped: ""
+      };
+      if (shouldRender) renderAll();
+    }
+
+    function deleteRecord(id) {
+      records = records.filter(r => r.id !== id);
+      localStorage.setItem("dogWalkRecords", JSON.stringify(records));
+      renderAll();
+    }
+
+    function resetAll() {
+      if (confirm("Delete all walk records?")) {
+        records = [];
+        localStorage.removeItem("dogWalkRecords");
+        renderAll();
+      }
+    }
+
+    function recordDogsText(r) {
+      const dogs = [];
+      if (r.liangSelected || r.dog === "Liang Liang") dogs.push("Liang Liang");
+      if (r.jingSelected || r.dog === "Jing Jing") dogs.push("Jing Jing");
+      return dogs.length ? dogs.join(" + ") : "-";
+    }
+
+    function renderRecords() {
+      const list = document.getElementById("recordList");
+
+      if (records.length === 0) {
+        list.innerHTML = `<div class="empty">No walks recorded yet.</div>`;
+        return;
+      }
+
+      list.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Dog(s)</th>
+              <th>Time</th>
+              <th>Walker</th>
+              <th>Minutes</th>
+              <th>Liang Liang Pooped</th>
+              <th>Jing Jing Pooped</th>
+              <th>Saved</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${records.map(r => `
+              <tr>
+                <td>${r.date}</td>
+                <td>${recordDogsText(r)}</td>
+                <td>${r.time}</td>
+                <td>${r.walker}</td>
+                <td>${r.minutes} min</td>
+                <td>${(r.liangSelected || r.dog === "Liang Liang") ? (r.liangPooped === "Yes" ? "✅ Yes" : "❌ No") : "-"}</td>
+                <td>${(r.jingSelected || r.dog === "Jing Jing") ? (r.jingPooped === "Yes" ? "✅ Yes" : "❌ No") : "-"}</td>
+                <td>${r.savedAt}</td>
+                <td><button class="delete-small" onclick="deleteRecord(${r.id})">Delete</button></td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderStats() {
+      const stats = document.getElementById("stats");
+      const today = new Date().toLocaleDateString("en-SG");
+      const todayRecords = records.filter(r => r.date === today);
+      const liangToday = todayRecords.filter(r => r.liangSelected || r.dog === "Liang Liang").length;
+      const jingToday = todayRecords.filter(r => r.jingSelected || r.dog === "Jing Jing").length;
+      const liangPoopToday = todayRecords.filter(r => (r.liangSelected || r.dog === "Liang Liang") && r.liangPooped === "Yes").length;
+      const jingPoopToday = todayRecords.filter(r => (r.jingSelected || r.dog === "Jing Jing") && r.jingPooped === "Yes").length;
+      const totalMinutesToday = todayRecords.reduce((sum, r) => sum + Number(r.minutes), 0);
+
+      stats.innerHTML = `
+        <div class="stat-card">
+          <div>Total Walk Records Today</div>
+          <div class="stat-number">${todayRecords.length}</div>
+        </div>
+        <div class="stat-card">
+          <div>Liang Liang Walks</div>
+          <div class="stat-number">${liangToday}</div>
+        </div>
+        <div class="stat-card">
+          <div>Jing Jing Walks</div>
+          <div class="stat-number">${jingToday}</div>
+        </div>
+        <div class="stat-card">
+          <div>Liang Liang Poops</div>
+          <div class="stat-number">${liangPoopToday}</div>
+        </div>
+        <div class="stat-card">
+          <div>Jing Jing Poops</div>
+          <div class="stat-number">${jingPoopToday}</div>
+        </div>
+        <div class="stat-card">
+          <div>Total Minutes Today</div>
+          <div class="stat-number">${totalMinutesToday}</div>
+        </div>
+      `;
+    }
+
+    function renderAll() {
+      makeButtons("walkerButtons", walkers, "walker");
+      document.getElementById("timeInput").value = selection.time;
+      makeButtons("minuteButtons", minutes, "minutes", m => `${m} min`);
+      makeToggleButtons("liangSelectedButtons", "liangSelected");
+      makeToggleButtons("jingSelectedButtons", "jingSelected");
+      makeButtons("liangPoopButtons", yesNo, "liangPooped", p => p === "Yes" ? "✅ Yes" : "❌ No");
+      makeButtons("jingPoopButtons", yesNo, "jingPooped", p => p === "Yes" ? "✅ Yes" : "❌ No");
+
+      document.getElementById("liangCard").className = selection.liangSelected ? "dog-card active" : "dog-card";
+      document.getElementById("jingCard").className = selection.jingSelected ? "dog-card active" : "dog-card";
+
+      renderSelection();
+      renderStats();
+      renderRecords();
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>
