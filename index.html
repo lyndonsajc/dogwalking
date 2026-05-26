@@ -428,36 +428,25 @@ const APP_VERSION = "firebase-firestore-sync-1";
       return true;
     }
 
-    function buildRecord() {
-      const now = new Date();
+   function buildRecord() {
+  const now = new Date();
 
-      return {
-        date: now.toLocaleDateString("en-SG"),
-          savedAt: now.toLocaleTimeString("en-SG", { hour: "2-digit", minute: "2-digit" }),
-          walker: "FIREBASE TEST",
-          time: "TEST",
-          minutes: "5",
-          liangSelected: true,
-          liangPooped: "Yes",
-          jingSelected: false,
-          jingPooped: "",
-          createdAt: serverTimestamp()
-        };
-      }
-
-      return {
-        date: now.toLocaleDateString("en-SG"),
-        savedAt: now.toLocaleTimeString("en-SG", { hour: "2-digit", minute: "2-digit" }),
-        walker: form.walker,
-        time: form.time,
-        minutes: String(form.minutes),
-        liangSelected: form.liangSelected,
-        liangPooped: form.liangPooped,
-        jingSelected: form.jingSelected,
-        jingPooped: form.jingPooped,
-        createdAt: serverTimestamp()
-      };
-    }
+  return {
+    date: now.toLocaleDateString("en-SG"),
+    savedAt: now.toLocaleTimeString("en-SG", {
+      hour: "2-digit",
+      minute: "2-digit"
+    }),
+    walker: form.walker,
+    time: form.time,
+    minutes: String(form.minutes),
+    liangSelected: form.liangSelected,
+    liangPooped: form.liangPooped,
+    jingSelected: form.jingSelected,
+    jingPooped: form.jingPooped,
+    createdAt: serverTimestamp()
+  };
+}
 
     async function saveRecord(record) {
       if (!firebaseReady || !db) {
