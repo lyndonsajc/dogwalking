@@ -251,7 +251,7 @@
           type="time" 
           id="timeInput" 
           onchange="updateTime(this.value)"
-          onkeydown="if(event.key==='Enter'){updateTime(this.value); this.blur();}"
+          onkeypress="if(event.key==='Enter'){event.preventDefault(); updateTime(this.value); document.getElementById('minuteButtons').scrollIntoView({behavior:'smooth', block:'center'});}"
           style="width:280px;"
         />
       </div>
