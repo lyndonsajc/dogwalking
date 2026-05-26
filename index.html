@@ -318,7 +318,7 @@
     // 4. Deploy as Web App
     // 5. Replace YOUR_GOOGLE_SCRIPT_URL below
 
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBxlVdnD3aoZSlbetIIUyPAaFw0KxFcF4OY9LeohDmJ0NQUbH2-QvYgQzTfHuOACZOQg/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdbghdGNu4F9LlnBnUT5p1xMPc6N6czM022rtARJTh0puIkBcAvTFrKEriRExLrOi90g/exec";
     const walkers = ["Mum", "ex-Dad", "Aidan", "Megan"];
     const minutes = [5, 10, 15, 20, 25, 30];
     const yesNo = ["Yes", "No"];
@@ -534,10 +534,38 @@
       return value === "Yes" ? "✅ Yes" : "❌ No";
     }
 
+    function displayTime(value) {
+      if (!value) return "-";
+      if (typeof value === "string" && value.includes("T")) {
+        const match = value.match(/T([0-9]{2}:[0-9]{2})/);
+        return match ? match[1] : value;
+      }
+      return value;
+    }
+
     function renderRecords() {
       const list = document.getElementById("recordList");
 
-      if (records.length === 0) {
+      const today = new Date();
+      const twoDaysAgo = new Date();
+      twoDaysAgo.setDate(today.getDate() - 1);
+
+      const recentRecords = records.filter(r => {
+        if (!r.date) return false;
+
+        const parts = r.date.split('/');
+        if (parts.length !== 3) return true;
+
+        const recordDate = new Date(parts[2], parts[1] - 1, parts[0]);
+        recordDate.setHours(0,0,0,0);
+
+        const compareDate = new Date(twoDaysAgo);
+        compareDate.setHours(0,0,0,0);
+
+        return recordDate >= compareDate;
+      });
+
+      if (recentRecords.length === 0) {
         list.innerHTML = `<div class="empty">No walks recorded yet.</div>`;
         return;
       }
@@ -558,11 +586,11 @@
             </tr>
           </thead>
           <tbody>
-            ${records.map(r => `
+            ${recentRecords.map(r => `
               <tr>
                 <td>${r.date}</td>
                 <td>${recordDogsText(r)}</td>
-                <td>${r.time}</td>
+                <td>${displayTime(r.time)}</td>
                 <td>${r.walker}</td>
                 <td>${r.minutes} min</td>
                 <td>${poopText(r, "Liang Liang")}</td>
