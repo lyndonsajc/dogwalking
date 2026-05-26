@@ -7,12 +7,12 @@
   <style>
     * {
       box-sizing: border-box;
-      font-family: Arial, sans-serif;
+      font-family: Inter, Arial, sans-serif;
     }
 
     body {
       margin: 0;
-      background: #f6f7fb;
+      background: linear-gradient(135deg, #fff7f0 0%, #f4f7ff 45%, #eefaf4 100%);
       color: #222;
     }
 
@@ -29,14 +29,19 @@
     h1 {
       margin: 0;
       text-align: center;
-      font-size: 28px;
+      font-size: 34px;
+      font-weight: 800;
+      color: #2b2f42;
+      letter-spacing: -0.5px;
     }
 
     .top, .bottom {
-      background: white;
-      border-radius: 18px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-      padding: 16px;
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(14px);
+      border-radius: 28px;
+      box-shadow: 0 10px 40px rgba(31, 41, 55, 0.12);
+      padding: 22px;
+      border: 1px solid rgba(255,255,255,0.5);
     }
 
     .top, .bottom {
@@ -66,18 +71,20 @@
       padding: 10px 16px;
       font-size: 15px;
       cursor: pointer;
-      background: #e8ecf5;
+      background: linear-gradient(135deg, #eef2ff, #f4f7ff);
       color: #222;
-      transition: 0.2s;
+      transition: all 0.22s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
 
     button:hover {
-      transform: translateY(-1px);
-      background: #dbe3f2;
+      transform: translateY(-2px) scale(1.02);
+      background: linear-gradient(135deg, #dfe8ff, #edf4ff);
+      box-shadow: 0 8px 18px rgba(47,111,237,0.16);
     }
 
     button.selected {
-      background: #2f6fed;
+      background: linear-gradient(135deg, #4f7cff, #2459e0);
       color: white;
       font-weight: bold;
     }
@@ -90,26 +97,32 @@
     }
 
     .dog-card {
-      border: 1px solid #dfe4ef;
+      border: 1px solid rgba(255,255,255,0.4);
       border-radius: 16px;
       padding: 14px;
-      background: #fbfcff;
+      background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(244,248,255,0.88));
+      box-shadow: 0 10px 24px rgba(31,41,55,0.08);
     }
 
     .dog-card h2 {
-      margin: 0 0 12px;
-      font-size: 20px;
+      margin: 0 0 14px;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .dog-card.active {
-      border: 2px solid #2f6fed;
-      background: #f1f5ff;
+      border: 2px solid #4f7cff;
+      background: linear-gradient(180deg, #eef4ff, #f8fbff);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(79,124,255,0.18);
     }
 
     .save-btn {
-      width: 100%;
+      flex: 1 1 260px;
       border-radius: 14px;
-      background: #1f9d55;
+      background: linear-gradient(135deg, #27c46a, #169c52);
       color: white;
       font-weight: bold;
       font-size: 18px;
@@ -121,20 +134,22 @@
     }
 
     .clear-btn {
+      flex: 1 1 180px;
       background: #f1b44c;
       color: #222;
       font-weight: bold;
     }
 
     .reset-btn {
+      flex: 1 1 180px;
       background: #e24a4a;
       color: white;
       font-weight: bold;
     }
 
     .summary-box {
-      background: #f1f5ff;
-      border-left: 5px solid #2f6fed;
+      background: linear-gradient(135deg, #eef4ff, #f6fbff);
+      border-left: 6px solid #4f7cff;
       border-radius: 12px;
       padding: 12px;
       margin-bottom: 14px;
@@ -175,31 +190,17 @@
       padding: 24px;
     }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .stat-card {
-      background: #f8f9fc;
-      border-radius: 14px;
-      padding: 12px;
-      border: 1px solid #e3e6ef;
-    }
-
-    .stat-number {
-      font-size: 24px;
-      font-weight: bold;
-      color: #2f6fed;
-    }
+    
 
     .delete-small {
       background: #eee;
       color: #555;
       padding: 6px 10px;
       font-size: 12px;
+    }
+
+    .daily-summary {
+      display: none;
     }
 
     @media (max-width: 800px) {
@@ -234,7 +235,7 @@
 </head>
 <body>
   <div class="app">
-    <h1>🐶 Family Dog Walking Tracker</h1>
+    <h1>🐾 Family Dog Walking Tracker</h1>
 
     <div class="top">
       <div class="summary-box" id="currentSelection">Select the walk details below.</div>
@@ -246,7 +247,13 @@
 
       <div class="section">
         <div class="section-title">2. Time walked</div>
-        <input type="time" id="timeInput" onchange="updateTime(this.value)" />
+        <input 
+          type="time" 
+          id="timeInput" 
+          onchange="updateTime(this.value)"
+          onkeydown="if(event.key==='Enter'){updateTime(this.value); this.blur();}"
+          style="width:280px;"
+        />
       </div>
 
       <div class="section">
@@ -261,7 +268,7 @@
 
       <div class="dog-panels">
         <div class="dog-card" id="liangCard">
-          <h2>Liang Liang</h2>
+          <h2>🐕 Liang Liang</h2>
           <div class="section">
             <div class="section-title">Selected?</div>
             <div class="button-grid" id="liangSelectedButtons"></div>
@@ -273,7 +280,7 @@
         </div>
 
         <div class="dog-card" id="jingCard">
-          <h2>Jing Jing</h2>
+          <h2>🦮 Jing Jing</h2>
           <div class="section">
             <div class="section-title">Selected?</div>
             <div class="button-grid" id="jingSelectedButtons"></div>
@@ -293,7 +300,7 @@
     </div>
 
     <div class="bottom">
-      <div class="stats" id="stats"></div>
+      
       <h2 style="margin-top:0;">Walk Records</h2>
       <div id="recordList"></div>
     </div>
@@ -316,14 +323,20 @@
 
     let records = JSON.parse(localStorage.getItem("dogWalkRecords")) || [];
 
-    function makeButtons(containerId, items, key, labelFn = x => x) {
+    function makeButtons(containerId, items, key, labelFn = x => x, disabled = false) {
       const container = document.getElementById(containerId);
       container.innerHTML = "";
       items.forEach(item => {
         const btn = document.createElement("button");
         btn.textContent = labelFn(item);
         btn.className = selection[key] === item ? "selected" : "";
+        btn.disabled = disabled;
+        if (disabled) {
+          btn.style.opacity = "0.45";
+          btn.style.cursor = "not-allowed";
+        }
         btn.onclick = () => {
+          if (disabled) return;
           selection[key] = item;
           renderAll();
         };
@@ -439,9 +452,21 @@
 
     function recordDogsText(r) {
       const dogs = [];
-      if (r.liangSelected || r.dog === "Liang Liang") dogs.push("Liang Liang");
-      if (r.jingSelected || r.dog === "Jing Jing") dogs.push("Jing Jing");
+      if (r.liangSelected || r.dog === "Liang Liang" || r.dog === "Liang Liang + Jing Jing") dogs.push("Liang Liang");
+      if (r.jingSelected || r.dog === "Jing Jing" || r.dog === "Liang Liang + Jing Jing") dogs.push("Jing Jing");
       return dogs.length ? dogs.join(" + ") : "-";
+    }
+
+    function dogWasWalked(r, dogName) {
+      if (dogName === "Liang Liang") return r.liangSelected || r.dog === "Liang Liang" || r.dog === "Liang Liang + Jing Jing";
+      if (dogName === "Jing Jing") return r.jingSelected || r.dog === "Jing Jing" || r.dog === "Liang Liang + Jing Jing";
+      return false;
+    }
+
+    function poopText(r, dogName) {
+      if (!dogWasWalked(r, dogName)) return "-";
+      const value = dogName === "Liang Liang" ? (r.liangPooped || r.pooped) : (r.jingPooped || r.pooped);
+      return value === "Yes" ? "✅ Yes" : "❌ No";
     }
 
     function renderRecords() {
@@ -475,8 +500,8 @@
                 <td>${r.time}</td>
                 <td>${r.walker}</td>
                 <td>${r.minutes} min</td>
-                <td>${(r.liangSelected || r.dog === "Liang Liang") ? (r.liangPooped === "Yes" ? "✅ Yes" : "❌ No") : "-"}</td>
-                <td>${(r.jingSelected || r.dog === "Jing Jing") ? (r.jingPooped === "Yes" ? "✅ Yes" : "❌ No") : "-"}</td>
+                <td>${poopText(r, "Liang Liang")}</td>
+                <td>${poopText(r, "Jing Jing")}</td>
                 <td>${r.savedAt}</td>
                 <td><button class="delete-small" onclick="deleteRecord(${r.id})">Delete</button></td>
               </tr>
@@ -486,58 +511,19 @@
       `;
     }
 
-    function renderStats() {
-      const stats = document.getElementById("stats");
-      const today = new Date().toLocaleDateString("en-SG");
-      const todayRecords = records.filter(r => r.date === today);
-      const liangToday = todayRecords.filter(r => r.liangSelected || r.dog === "Liang Liang").length;
-      const jingToday = todayRecords.filter(r => r.jingSelected || r.dog === "Jing Jing").length;
-      const liangPoopToday = todayRecords.filter(r => (r.liangSelected || r.dog === "Liang Liang") && r.liangPooped === "Yes").length;
-      const jingPoopToday = todayRecords.filter(r => (r.jingSelected || r.dog === "Jing Jing") && r.jingPooped === "Yes").length;
-      const totalMinutesToday = todayRecords.reduce((sum, r) => sum + Number(r.minutes), 0);
-
-      stats.innerHTML = `
-        <div class="stat-card">
-          <div>Total Walk Records Today</div>
-          <div class="stat-number">${todayRecords.length}</div>
-        </div>
-        <div class="stat-card">
-          <div>Liang Liang Walks</div>
-          <div class="stat-number">${liangToday}</div>
-        </div>
-        <div class="stat-card">
-          <div>Jing Jing Walks</div>
-          <div class="stat-number">${jingToday}</div>
-        </div>
-        <div class="stat-card">
-          <div>Liang Liang Poops</div>
-          <div class="stat-number">${liangPoopToday}</div>
-        </div>
-        <div class="stat-card">
-          <div>Jing Jing Poops</div>
-          <div class="stat-number">${jingPoopToday}</div>
-        </div>
-        <div class="stat-card">
-          <div>Total Minutes Today</div>
-          <div class="stat-number">${totalMinutesToday}</div>
-        </div>
-      `;
-    }
-
     function renderAll() {
       makeButtons("walkerButtons", walkers, "walker");
       document.getElementById("timeInput").value = selection.time;
       makeButtons("minuteButtons", minutes, "minutes", m => `${m} min`);
       makeToggleButtons("liangSelectedButtons", "liangSelected");
       makeToggleButtons("jingSelectedButtons", "jingSelected");
-      makeButtons("liangPoopButtons", yesNo, "liangPooped", p => p === "Yes" ? "✅ Yes" : "❌ No");
-      makeButtons("jingPoopButtons", yesNo, "jingPooped", p => p === "Yes" ? "✅ Yes" : "❌ No");
+      makeButtons("liangPoopButtons", yesNo, "liangPooped", p => p === "Yes" ? "✅ Yes" : "❌ No", !selection.liangSelected);
+      makeButtons("jingPoopButtons", yesNo, "jingPooped", p => p === "Yes" ? "✅ Yes" : "❌ No", !selection.jingSelected);
 
       document.getElementById("liangCard").className = selection.liangSelected ? "dog-card active" : "dog-card";
       document.getElementById("jingCard").className = selection.jingSelected ? "dog-card active" : "dog-card";
 
       renderSelection();
-      renderStats();
       renderRecords();
     }
 
