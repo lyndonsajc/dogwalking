@@ -247,13 +247,15 @@
 
       <div class="section">
         <div class="section-title">2. Time walked</div>
-        <input 
-          type="time" 
-          id="timeInput" 
-          onchange="updateTime(this.value)"
-          onkeypress="if(event.key==='Enter'){event.preventDefault(); updateTime(this.value); document.getElementById('minuteButtons').scrollIntoView({behavior:'smooth', block:'center'});}"
-          style="width:280px;"
-        />
+        <div class="button-grid" style="align-items:center;">
+          <input 
+            type="time" 
+            id="timeInput" 
+            onchange="updateTime(this.value)"
+            style="width:220px;"
+          />
+          <button onclick="setCurrentTime()">⏰ Use Current Time</button>
+        </div>
       </div>
 
       <div class="section">
@@ -376,6 +378,17 @@
 
     function updateTime(value) {
       selection.time = value;
+      renderAll();
+    }
+
+    function setCurrentTime() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const currentTime = `${hours}:${minutes}`;
+
+      selection.time = currentTime;
+      document.getElementById('timeInput').value = currentTime;
       renderAll();
     }
 
