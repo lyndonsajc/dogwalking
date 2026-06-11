@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Family Dog Walking Tracker</title>
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
 
     body {
       margin: 0;
@@ -35,15 +32,11 @@
     }
 
     .panel {
-      background: rgba(255,255,255,0.88);
+      background: rgba(255,255,255,0.9);
       border-radius: 24px;
       padding: 18px;
       box-shadow: 0 10px 28px rgba(0,0,0,0.10);
-    }
-
-    .top, .bottom {
-      flex: 1;
-      overflow-y: auto;
+      overflow: hidden;
     }
 
     .summary {
@@ -55,9 +48,7 @@
       line-height: 1.6;
     }
 
-    .section {
-      margin-bottom: 15px;
-    }
+    .section { margin-bottom: 15px; }
 
     .section-title {
       font-weight: bold;
@@ -83,9 +74,7 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.06);
     }
 
-    button:hover {
-      background: #dfe8ff;
-    }
+    button:hover { background: #dfe8ff; }
 
     button.selected {
       background: #376cf0;
@@ -145,8 +134,6 @@
       font-weight: bold;
     }
 
-    
-
     .status {
       margin-top: 10px;
       padding: 10px;
@@ -156,24 +143,79 @@
       font-size: 14px;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .records-title {
+      margin: 0 0 12px;
+      font-size: 24px;
+      color: #222;
+    }
+
+    .record-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .record-card {
+      border: 1px solid #e3e8f2;
+      border-radius: 16px;
+      background: #fbfcff;
+      padding: 12px;
+    }
+
+    .record-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: start;
+      margin-bottom: 10px;
+    }
+
+    .record-main {
+      font-weight: 800;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    .record-time {
+      font-size: 15px;
+      font-weight: 800;
+      background: #eef4ff;
+      color: #244bc7;
+      padding: 6px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .record-details {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .mini-box {
+      background: #f3f5fa;
+      border-radius: 12px;
+      padding: 8px;
+      min-width: 0;
+    }
+
+    .mini-label {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .mini-value {
       font-size: 14px;
+      font-weight: 800;
+      line-height: 1.25;
+      word-break: break-word;
     }
 
-    th, td {
-      border-bottom: 1px solid #ddd;
-      padding: 9px;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th {
-      background: #f0f2f7;
-      position: sticky;
-      top: 0;
-    }
+    .yes { color: #138a42; }
+    .no { color: #c92a2a; }
+    .dash { color: #777; }
 
     .empty {
       text-align: center;
@@ -182,30 +224,22 @@
     }
 
     @media (max-width: 760px) {
-      h1 {
-        font-size: 23px;
-      }
+      .app { padding: 10px; }
+      h1 { font-size: 23px; }
+      .dog-grid { grid-template-columns: 1fr; }
+      .panel { padding: 14px; border-radius: 22px; }
+      button { font-size: 14px; padding: 9px 12px; }
+      .records-title { font-size: 22px; }
+      .record-details { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+      .mini-box { padding: 7px 5px; }
+      .mini-label { font-size: 10px; }
+      .mini-value { font-size: 12px; }
+      .record-main { font-size: 15px; }
+      .record-time { font-size: 13px; padding: 6px 8px; }
+    }
 
-      .dog-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .panel {
-        padding: 14px;
-      }
-
-      button {
-        font-size: 14px;
-        padding: 9px 12px;
-      }
-
-      table {
-        font-size: 12px;
-      }
-
-      th, td {
-        padding: 7px;
-      }
+    @media (max-width: 390px) {
+      .record-details { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -213,7 +247,7 @@
   <div class="app">
     <h1>🐾 Family Dog Walking Tracker</h1>
 
-    <div class="panel top">
+    <div class="panel">
       <div class="summary" id="summary">Select walk details below.</div>
 
       <div class="section">
@@ -259,15 +293,14 @@
 
       <div class="buttons">
         <button class="save-btn" onclick="saveWalk()">Save Walk</button>
-        
         <button class="clear-btn" onclick="clearForm()">Clear Selection</button>
       </div>
 
       <div class="status" id="status">Ready.</div>
     </div>
 
-    <div class="panel bottom">
-      <h2 style="margin-top:0;">Shared Family Records — Last 2 Days</h2>
+    <div class="panel">
+      <h2 class="records-title">Family Records — Last 2 Days</h2>
       <div id="recordList"></div>
     </div>
   </div>
@@ -285,7 +318,6 @@
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyCn2h_SEwcIHVHYiTbScvcpmU7waIXfrnc",
       authDomain: "dog-walking-tracker-67ece.firebaseapp.com",
@@ -296,8 +328,8 @@
       measurementId: "G-PKCWFB067V"
     };
 
-const APP_VERSION = "firebase-firestore-sync-1";
-    const walkers = ["Mum", "Dad", "Aidan", "Megan"];
+    const APP_VERSION = "compact-records-final-1";
+    const walkers = ["Mum", "Dad", "ex-Dad", "Aidan", "Megan"];
     const durations = [5, 10, 15, 20, 25, 30];
     const yesNo = ["Yes", "No"];
 
@@ -321,16 +353,10 @@ const APP_VERSION = "firebase-firestore-sync-1";
 
     function initFirebase() {
       try {
-        if (firebaseConfig.apiKey.includes("PASTE_YOUR")) {
-          firebaseReady = false;
-          setStatus("Firebase config not added yet. Paste your firebaseConfig into index.html.");
-          return;
-        }
-
         const app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         firebaseReady = true;
-        setStatus("Firebase connected. Version: " + APP_VERSION);
+        setStatus("Live sync active. Records updated.");
         listenToRecords();
       } catch (error) {
         firebaseReady = false;
@@ -428,35 +454,32 @@ const APP_VERSION = "firebase-firestore-sync-1";
       return true;
     }
 
-   function buildRecord() {
-  const now = new Date();
+    function buildRecord() {
+      const now = new Date();
 
-  return {
-    date: now.toLocaleDateString("en-SG"),
-    savedAt: now.toLocaleTimeString("en-SG", {
-      hour: "2-digit",
-      minute: "2-digit"
-    }),
-    walker: form.walker,
-    time: form.time,
-    minutes: String(form.minutes),
-    liangSelected: form.liangSelected,
-    liangPooped: form.liangPooped,
-    jingSelected: form.jingSelected,
-    jingPooped: form.jingPooped,
-    createdAt: serverTimestamp()
-  };
-}
+      return {
+        date: now.toLocaleDateString("en-SG"),
+        savedAt: now.toLocaleTimeString("en-SG", { hour: "2-digit", minute: "2-digit" }),
+        walker: form.walker,
+        time: form.time,
+        minutes: String(form.minutes),
+        liangSelected: form.liangSelected,
+        liangPooped: form.liangPooped,
+        jingSelected: form.jingSelected,
+        jingPooped: form.jingPooped,
+        createdAt: serverTimestamp()
+      };
+    }
 
     async function saveRecord(record) {
       if (!firebaseReady || !db) {
-        setStatus("Firebase is not ready. Check firebaseConfig and Firestore rules.");
+        setStatus("Firebase is not ready. Check Firebase rules.");
         return;
       }
 
       try {
         await addDoc(collection(db, "dogWalks"), record);
-        setStatus("Saved to Firebase. All family devices should sync.");
+        setStatus("Saved. All family devices should sync.");
       } catch (error) {
         setStatus("Save failed: " + error.message);
       }
@@ -464,13 +487,11 @@ const APP_VERSION = "firebase-firestore-sync-1";
 
     window.saveWalk = async function() {
       if (!validateForm()) return;
-      const record = buildRecord(false);
+      const record = buildRecord();
       await saveRecord(record);
       clearForm(false);
       render();
     };
-
-    
 
     function listenToRecords() {
       const q = query(collection(db, "dogWalks"), orderBy("createdAt", "desc"), limit(50));
@@ -510,10 +531,22 @@ const APP_VERSION = "firebase-firestore-sync-1";
       return dogs.join(" + ") || "-";
     }
 
+    function statusText(value) {
+      if (value === "Yes") return `<span class="yes">✅ Yes</span>`;
+      if (value === "No") return `<span class="no">❌ No</span>`;
+      return `<span class="dash">—</span>`;
+    }
+
+    function walkedText(r, dog) {
+      return dogWasWalked(r, dog)
+        ? `<span class="yes">✅ Yes</span>`
+        : `<span class="no">❌ No</span>`;
+    }
+
     function poopText(r, dog) {
-      if (!dogWasWalked(r, dog)) return "-";
+      if (!dogWasWalked(r, dog)) return `<span class="dash">—</span>`;
       const value = dog === "Liang Liang" ? r.liangPooped : r.jingPooped;
-      return value === "Yes" ? "✅ Yes" : "❌ No";
+      return statusText(value);
     }
 
     function isLastTwoDays(r) {
@@ -538,34 +571,35 @@ const APP_VERSION = "firebase-firestore-sync-1";
       }
 
       list.innerHTML = `
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Dog(s)</th>
-              <th>Time</th>
-              <th>Walker</th>
-              <th>Minutes</th>
-              <th>Liang Liang Pooped</th>
-              <th>Jing Jing Pooped</th>
-              <th>Saved At</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${recent.map(r => `
-              <tr>
-                <td>${r.date || ""}</td>
-                <td>${dogText(r)}</td>
-                <td>${r.time || ""}</td>
-                <td>${r.walker || ""}</td>
-                <td>${r.minutes || ""} min</td>
-                <td>${poopText(r, "Liang Liang")}</td>
-                <td>${poopText(r, "Jing Jing")}</td>
-                <td>${r.savedAt || ""}</td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
+        <div class="record-list">
+          ${recent.map(r => `
+            <div class="record-card">
+              <div class="record-top">
+                <div class="record-main">${r.walker || "-"} · ${r.minutes || "-"} min<br><span style="font-weight:600;color:#64748b;">${dogText(r)}</span></div>
+                <div class="record-time">${r.time || "-"}</div>
+              </div>
+
+              <div class="record-details">
+                <div class="mini-box">
+                  <div class="mini-label">Liang Walk</div>
+                  <div class="mini-value">${walkedText(r, "Liang Liang")}</div>
+                </div>
+                <div class="mini-box">
+                  <div class="mini-label">Liang Poop</div>
+                  <div class="mini-value">${poopText(r, "Liang Liang")}</div>
+                </div>
+                <div class="mini-box">
+                  <div class="mini-label">Jing Walk</div>
+                  <div class="mini-value">${walkedText(r, "Jing Jing")}</div>
+                </div>
+                <div class="mini-box">
+                  <div class="mini-label">Jing Poop</div>
+                  <div class="mini-value">${poopText(r, "Jing Jing")}</div>
+                </div>
+              </div>
+            </div>
+          `).join("")}
+        </div>
       `;
     }
 
